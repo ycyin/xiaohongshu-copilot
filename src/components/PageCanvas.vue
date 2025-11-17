@@ -163,14 +163,15 @@ if (typeof document !== 'undefined') {
         class="canvas-element"
         :class="{
           selected: element.id === selectedElementId,
-          editing: element.id === editingElementId
+          editing: element.id === editingElementId,
+          'no-center': element.type === 'line'
         }"
         :style="{
           left: element.x + 'px',
           top: element.y + 'px',
-          transform: element.type === 'text'
+          transform: (element.type === 'text' || element.type === 'icon' || element.type === 'rectangle' || element.type === 'circle')
             ? `translate(-50%, -50%)`
-            : 'translate(-50%, -50%)'
+            : 'none'
         }"
         @mousedown="(e) => onElementMouseDown(e, element)"
         @click="(e) => { selectElement(element.id); startEditing(element, e); }"
@@ -221,6 +222,44 @@ if (typeof document !== 'undefined') {
         >
           {{ element.text }}
         </div>
+
+        <!-- Rectangle Element -->
+        <div
+          v-if="element.type === 'rectangle'"
+          class="rectangle-element"
+          :style="{
+            width: element.width + 'px',
+            height: element.height + 'px',
+            backgroundColor: element.backgroundColor || 'transparent',
+            border: element.border || '2px solid #333',
+            borderRadius: (element.borderRadius || 0) + 'px'
+          }"
+        ></div>
+
+        <!-- Circle Element -->
+        <div
+          v-if="element.type === 'circle'"
+          class="circle-element"
+          :style="{
+            width: element.size + 'px',
+            height: element.size + 'px',
+            backgroundColor: element.backgroundColor || 'transparent',
+            border: element.border || '2px solid #333'
+          }"
+        ></div>
+
+        <!-- Line Element -->
+        <div
+          v-if="element.type === 'line'"
+          class="line-element"
+          :style="{
+            width: element.width + 'px',
+            height: element.height || '2px',
+            backgroundColor: element.color || '#333',
+            transform: element.rotate ? `rotate(${element.rotate}deg)` : 'none',
+            transformOrigin: 'left center'
+          }"
+        ></div>
 
         <!-- Selection Handles -->
         <div v-if="element.id === selectedElementId && !editingElementId" class="selection-handles">
@@ -282,6 +321,19 @@ if (typeof document !== 'undefined') {
   pointer-events: none;
   text-align: center;
   line-height: 1;
+}
+
+.rectangle-element {
+  pointer-events: none;
+}
+
+.circle-element {
+  pointer-events: none;
+  border-radius: 50%;
+}
+
+.line-element {
+  pointer-events: none;
 }
 
 .selection-handles {

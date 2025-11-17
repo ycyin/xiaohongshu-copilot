@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue'
 import InfiniteCanvas from './components/InfiniteCanvas.vue'
 import IconLibrary from './components/IconLibrary.vue'
+import TemplateLibrary from './components/TemplateLibrary.vue'
 import TextEditor from './components/TextEditor.vue'
 import PageEditor from './components/PageEditor.vue'
 import { downloadImage } from './utils/canvasRenderer'
@@ -15,6 +16,9 @@ const selectedElementPageId = ref(null)
 // Sidebar collapse state
 const leftSidebarCollapsed = ref(false)
 const rightSidebarCollapsed = ref(false)
+
+// Left sidebar tab (icon or template)
+const leftSidebarTab = ref('icon') // 'icon' or 'template'
 
 // Computed: current selected page
 const selectedPage = computed(() => {
@@ -55,6 +59,18 @@ const handleAddIcon = (emoji) => {
       y: 500,
       fontSize: 64,
       color: '#333'
+    })
+  }
+}
+
+// Handle adding template from library
+const handleAddTemplate = (template) => {
+  if (canvasRef.value) {
+    // Add all elements from template to current page
+    template.elements.forEach(element => {
+      canvasRef.value.addElementToCurrentPage({
+        ...element
+      })
     })
   }
 }
@@ -202,15 +218,35 @@ const handleExportAll = () => {
     </header>
 
     <main class="app-main">
-      <!-- Three-column layout: Icon Library | Infinite Canvas | Text Editor -->
+      <!-- Three-column layout: Icon/Template Library | Infinite Canvas | Text Editor -->
       <div class="editor-workspace">
-        <!-- Left: Icon Library -->
+        <!-- Left: Icon Library & Template Library -->
         <aside class="sidebar sidebar-left" :class="{ collapsed: leftSidebarCollapsed }">
           <button class="collapse-btn" @click="leftSidebarCollapsed = !leftSidebarCollapsed">
             {{ leftSidebarCollapsed ? '▶' : '◀' }}
           </button>
           <div v-show="!leftSidebarCollapsed" class="sidebar-content">
-            <IconLibrary @add-icon="handleAddIcon" />
+            <!-- Tab Switcher -->
+            <div class="sidebar-tabs">
+              <button
+                @click="leftSidebarTab = 'template'"
+                :class="['sidebar-tab', { active: leftSidebarTab === 'template' }]"
+              >
+                📋 模板
+              </button>
+              <button
+                @click="leftSidebarTab = 'icon'"
+                :class="['sidebar-tab', { active: leftSidebarTab === 'icon' }]"
+              >
+                😀 图标
+              </button>
+            </div>
+
+            <!-- Content -->
+            <div class="sidebar-tab-content">
+              <TemplateLibrary v-if="leftSidebarTab === 'template'" @add-template="handleAddTemplate" />
+              <IconLibrary v-else @add-icon="handleAddIcon" />
+            </div>
           </div>
         </aside>
 
@@ -355,6 +391,48 @@ const handleExportAll = () => {
   width: 100%;
   height: 100%;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid #e5e5e5;
+  background: white;
+  flex-shrink: 0;
+}
+
+.sidebar-tab {
+  flex: 1;
+  padding: 12px 8px;
+  border: none;
+  background: #f5f5f5;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: #666;
+  transition: all 0.2s;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+}
+
+.sidebar-tab:hover {
+  background: #e8e8e8;
+  color: #333;
+}
+
+.sidebar-tab.active {
+  background: white;
+  color: #333;
+  border-bottom-color: #4a90e2;
+}
+
+.sidebar-tab-content {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .collapse-btn {
