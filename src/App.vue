@@ -320,8 +320,7 @@ const handleExportAll = () => {
 }
 
 .editor-workspace {
-  display: grid;
-  grid-template-columns: 250px 1fr 320px;
+  display: flex;
   gap: 0;
   height: calc(100vh - 90px);
   background: #e8e8e8;
@@ -333,21 +332,23 @@ const handleExportAll = () => {
   overflow: hidden;
   position: relative;
   transition: all 0.3s ease;
-}
-
-.sidebar.collapsed {
-  width: 40px !important;
-  min-width: 40px;
+  flex-shrink: 0;
 }
 
 .sidebar-left {
+  width: 250px;
   border-right: 1px solid #d0d0d0;
   background: #fafafa;
 }
 
 .sidebar-right {
+  width: 320px;
   border-left: 1px solid #d0d0d0;
   background: #fafafa;
+}
+
+.sidebar.collapsed {
+  width: 40px;
 }
 
 .sidebar-content {
@@ -390,6 +391,7 @@ const handleExportAll = () => {
 }
 
 .canvas-section {
+  flex: 1;
   height: 100%;
   overflow: hidden;
   background: #e8e8e8;
@@ -397,8 +399,12 @@ const handleExportAll = () => {
 
 /* Responsive */
 @media (max-width: 1280px) {
-  .editor-workspace {
-    grid-template-columns: 200px 1fr 280px;
+  .sidebar-left {
+    width: 200px;
+  }
+
+  .sidebar-right {
+    width: 280px;
   }
 }
 
@@ -409,8 +415,7 @@ const handleExportAll = () => {
   }
 
   .editor-workspace {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto 1fr auto;
+    flex-direction: column;
   }
 
   .sidebar-left,
