@@ -82,7 +82,7 @@ xiaohongshu-copilot/
 
 1. **克隆项目 | Clone repository**:
    ```bash
-   git clone https://github.com/yourusername/xiaohongshu-copilot.git
+   git clone https://github.com/ycyin/xiaohongshu-copilot.git
    cd xiaohongshu-copilot
    ```
 
@@ -349,8 +349,8 @@ MIT License - 自由使用、修改和分发
 
 ## 💬 反馈与支持 | Feedback & Support
 
-- **Issue**: [GitHub Issues](https://github.com/yourusername/xiaohongshu-copilot/issues)
-- **讨论**: [GitHub Discussions](https://github.com/yourusername/xiaohongshu-copilot/discussions)
+- **Issue**: [GitHub Issues](https://github.com/ycyin/xiaohongshu-copilot/issues)
+- **讨论**: [GitHub Discussions](https://github.com/ycyin/xiaohongshu-copilot/discussions)
 
 ## 🙏 致谢 | Acknowledgments
 
