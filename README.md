@@ -80,6 +80,8 @@ xiaohongshu-copilot/
 
 ## 🚀 安装与运行 | Installation & Setup
 
+### 本地开发
+
 1. **克隆项目 | Clone repository**:
    ```bash
    git clone https://github.com/ycyin/xiaohongshu-copilot.git
@@ -106,6 +108,18 @@ xiaohongshu-copilot/
    ```bash
    npm run preview
    ```
+
+### 部署到 Vercel（推荐）
+
+**最快部署方式** - 只需 3 步：
+
+1. 推送代码到 GitHub
+2. 在 [vercel.com](https://vercel.com) 导入项目
+3. 点击部署 ✨
+
+详细部署指南请查看 **[DEPLOYMENT.md](./DEPLOYMENT.md)**
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/ycyin/xiaohongshu-copilot)
 
 ## 📖 使用指南 | User Guide
 

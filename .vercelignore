@@ -1,0 +1,14 @@
+# Vercel ignore - 忽略不需要上传到 Vercel 的文件
+
+# Documentation
+DEPLOYMENT.md
+DEMO_CONTENT.md
+
+# Development files
+.git
+.gitignore
+node_modules
+
+# Editor
+.vscode
+.idea
