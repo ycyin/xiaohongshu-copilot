@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import InfiniteCanvas from './components/InfiniteCanvas.vue'
 import IconLibrary from './components/IconLibrary.vue'
 import TextEditor from './components/TextEditor.vue'
+import PageEditor from './components/PageEditor.vue'
 import { downloadImage } from './utils/canvasRenderer'
 
 // Canvas ref
@@ -15,10 +16,33 @@ const selectedElementPageId = ref(null)
 const leftSidebarCollapsed = ref(false)
 const rightSidebarCollapsed = ref(false)
 
+// Computed: current selected page
+const selectedPage = computed(() => {
+  if (!canvasRef.value || !selectedPageId.value) return null
+  return canvasRef.value.pages?.find(p => p.id === selectedPageId.value)
+})
+
+// Right editor mode: 'element' or 'page'
+const rightEditorMode = computed(() => {
+  return selectedElement.value ? 'element' : 'page'
+})
+
 // Handle element selection
 const handleElementSelected = (element, pageId) => {
   selectedElement.value = element
   selectedElementPageId.value = pageId
+  // If element is null (deselected), we're now in page editing mode
+  if (element === null) {
+    selectedElement.value = null
+    selectedElementPageId.value = null
+  }
+}
+
+// Handle page click (deselect element, edit page instead)
+const handlePageClick = (pageId) => {
+  selectedPageId.value = pageId
+  selectedElement.value = null // Deselect element
+  selectedElementPageId.value = null
 }
 
 // Handle adding icon from library
@@ -48,6 +72,13 @@ const handleUpdateProperty = (property, value) => {
         selectedElement.value = { ...element }
       }
     }
+  }
+}
+
+// Handle page property updates from page editor
+const handleUpdatePageProperty = (property, value) => {
+  if (selectedPage.value && canvasRef.value) {
+    selectedPage.value[property] = value
   }
 }
 
@@ -187,20 +218,28 @@ const handleExportAll = () => {
         <section class="canvas-section">
           <InfiniteCanvas
             ref="canvasRef"
-            @page-selected="(id) => selectedPageId = id"
+            @page-selected="handlePageClick"
             @element-selected="handleElementSelected"
           />
         </section>
 
-        <!-- Right: Text Editor -->
+        <!-- Right: Editor (switches between Page and Text) -->
         <aside class="sidebar sidebar-right" :class="{ collapsed: rightSidebarCollapsed }">
           <button class="collapse-btn" @click="rightSidebarCollapsed = !rightSidebarCollapsed">
             {{ rightSidebarCollapsed ? '◀' : '▶' }}
           </button>
           <div v-show="!rightSidebarCollapsed" class="sidebar-content">
+            <!-- Show TextEditor when element is selected -->
             <TextEditor
+              v-if="rightEditorMode === 'element'"
               :selected-element="selectedElement"
               @update-property="handleUpdateProperty"
+            />
+            <!-- Show PageEditor when no element is selected -->
+            <PageEditor
+              v-else
+              :selected-page="selectedPage"
+              @update-page-property="handleUpdatePageProperty"
             />
           </div>
         </aside>
