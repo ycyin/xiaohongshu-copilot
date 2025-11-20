@@ -5,6 +5,7 @@ import IconLibrary from './components/IconLibrary.vue'
 import TemplateLibrary from './components/TemplateLibrary.vue'
 import TextEditor from './components/TextEditor.vue'
 import PageEditor from './components/PageEditor.vue'
+import ConnectorEditor from './components/ConnectorEditor.vue'
 import { downloadImage } from './utils/canvasRenderer'
 
 // Canvas ref
@@ -26,10 +27,17 @@ const selectedPage = computed(() => {
   return canvasRef.value.pages?.find(p => p.id === selectedPageId.value)
 })
 
-// Right editor mode: 'element' or 'page'
+// Right editor mode: 'element', 'page', or 'connector'
 const rightEditorMode = computed(() => {
-  return selectedElement.value ? 'element' : 'page'
+  if (selectedElement.value) {
+    return selectedElement.value.type === 'connector' ? 'connector' : 'element'
+  }
+  return 'page'
 })
+
+// Connector mode
+const isConnectorMode = ref(false)
+const connectorStart = ref(null)
 
 // Handle element selection
 const handleElementSelected = (element, pageId) => {
@@ -113,6 +121,96 @@ const handleAddText = () => {
       width: 600
     })
   }
+}
+
+// Handle edge click for connector creation
+const handleEdgeClick = (elementId, edge, pageId) => {
+  console.log('Edge clicked:', elementId, edge, pageId) // Debug log
+
+  const page = canvasRef.value.pages.find(p => p.id === pageId)
+  if (!page) return
+
+  const element = page.elements.find(el => el.id === elementId)
+  if (!element) return
+
+  // Calculate edge coordinates
+  const edgeCoords = calculateEdgeCoordinates(element, edge)
+
+  if (!connectorStart.value) {
+    // First click - store start point
+    connectorStart.value = {
+      elementId,
+      edge,
+      x: edgeCoords.x,
+      y: edgeCoords.y,
+      pageId
+    }
+    console.log('Connector start set:', connectorStart.value) // Debug log
+  } else {
+    // Second click - create connector
+    if (connectorStart.value.pageId === pageId) {
+      console.log('Creating connector from', connectorStart.value, 'to', edgeCoords) // Debug log
+      // Add connector to the specific page (not current page)
+      canvasRef.value.addElementToPage(pageId, {
+        type: 'connector',
+        fromX: connectorStart.value.x,
+        fromY: connectorStart.value.y,
+        toX: edgeCoords.x,
+        toY: edgeCoords.y,
+        lineType: 'straight',
+        style: 'solid',
+        color: '#3498db',
+        strokeWidth: 2,
+        startArrow: false,
+        endArrow: true
+      })
+    }
+    // Reset
+    connectorStart.value = null
+    console.log('Connector creation complete, reset state') // Debug log
+  }
+}
+
+// Calculate edge coordinates based on element position and edge
+const calculateEdgeCoordinates = (element, edge) => {
+  let x = element.x
+  let y = element.y
+
+  // For centered elements (text, icon, rectangle, circle)
+  if (element.type === 'text' || element.type === 'icon' || element.type === 'rectangle' || element.type === 'circle') {
+    let width, height
+
+    if (element.type === 'text') {
+      width = element.width || 100
+      height = element.fontSize ? element.fontSize * 1.3 : 50
+    } else if (element.type === 'icon') {
+      width = element.fontSize || 64
+      height = element.fontSize || 64
+    } else if (element.type === 'rectangle') {
+      width = element.width || 100
+      height = element.height || 100
+    } else if (element.type === 'circle') {
+      width = element.size || 100
+      height = element.size || 100
+    }
+
+    switch(edge) {
+      case 'top':
+        y = element.y - height / 2
+        break
+      case 'right':
+        x = element.x + width / 2
+        break
+      case 'bottom':
+        y = element.y + height / 2
+        break
+      case 'left':
+        x = element.x - width / 2
+        break
+    }
+  }
+
+  return { x, y }
 }
 
 // Export current page
@@ -256,6 +354,7 @@ const handleExportAll = () => {
             ref="canvasRef"
             @page-selected="handlePageClick"
             @element-selected="handleElementSelected"
+            @edge-click="handleEdgeClick"
           />
         </section>
 
@@ -265,9 +364,15 @@ const handleExportAll = () => {
             {{ rightSidebarCollapsed ? '◀' : '▶' }}
           </button>
           <div v-show="!rightSidebarCollapsed" class="sidebar-content">
+            <!-- Show ConnectorEditor when connector is selected -->
+            <ConnectorEditor
+              v-if="rightEditorMode === 'connector'"
+              :selected-connector="selectedElement"
+              @update-property="handleUpdateProperty"
+            />
             <!-- Show TextEditor when element is selected -->
             <TextEditor
-              v-if="rightEditorMode === 'element'"
+              v-else-if="rightEditorMode === 'element'"
               :selected-element="selectedElement"
               @update-property="handleUpdateProperty"
             />

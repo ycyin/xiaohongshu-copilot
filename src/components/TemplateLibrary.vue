@@ -117,6 +117,40 @@ const categories = ref([
     icon: '→',
     templates: [
       {
+        id: 'flow-with-connectors',
+        name: '连接线流程图',
+        preview: '连线',
+        elements: [
+          // Title
+          { type: 'text', text: '流程图示例', x: 375, y: 80, fontSize: 40, fontWeight: 'bold', color: '#2c3e50', align: 'center', width: 600 },
+
+          // Step 1
+          { type: 'rectangle', x: 150, y: 250, width: 150, height: 100, backgroundColor: '#e8f5fe', border: '3px solid #3498db', borderRadius: 15 },
+          { type: 'text', text: '开始', x: 150, y: 250, fontSize: 26, fontWeight: 'bold', color: '#3498db', align: 'center', width: 140 },
+
+          // Connector 1
+          { type: 'connector', fromX: 225, fromY: 250, toX: 340, toY: 250, lineType: 'straight', style: 'solid', color: '#3498db', strokeWidth: 3, startArrow: false, endArrow: true },
+
+          // Step 2
+          { type: 'rectangle', x: 375, y: 250, width: 150, height: 100, backgroundColor: '#ebfaf5', border: '3px solid #2ecc71', borderRadius: 15 },
+          { type: 'text', text: '处理', x: 375, y: 250, fontSize: 26, fontWeight: 'bold', color: '#2ecc71', align: 'center', width: 140 },
+
+          // Connector 2
+          { type: 'connector', fromX: 450, fromY: 250, toX: 565, toY: 250, lineType: 'straight', style: 'solid', color: '#2ecc71', strokeWidth: 3, startArrow: false, endArrow: true },
+
+          // Step 3
+          { type: 'rectangle', x: 600, y: 250, width: 150, height: 100, backgroundColor: '#fef5e7', border: '3px solid #f39c12', borderRadius: 15 },
+          { type: 'text', text: '完成', x: 600, y: 250, fontSize: 26, fontWeight: 'bold', color: '#f39c12', align: 'center', width: 140 },
+
+          // Branch connector (curved)
+          { type: 'connector', fromX: 375, fromY: 300, toX: 375, toY: 430, lineType: 'elbow', style: 'dashed', color: '#e74c3c', strokeWidth: 2, startArrow: false, endArrow: true },
+
+          // Branch step
+          { type: 'rectangle', x: 375, y: 480, width: 180, height: 80, backgroundColor: '#fdeef4', border: '3px solid #e74c3c', borderRadius: 15 },
+          { type: 'text', text: '异常处理', x: 375, y: 480, fontSize: 22, fontWeight: 'bold', color: '#e74c3c', align: 'center', width: 160 },
+        ]
+      },
+      {
         id: 'flow-modern-horizontal',
         name: '现代横向流程',
         preview: '步骤',

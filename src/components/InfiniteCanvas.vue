@@ -2,7 +2,7 @@
 import { ref, computed, onMounted, nextTick } from 'vue'
 import PageCanvas from './PageCanvas.vue'
 
-const emit = defineEmits(['page-selected', 'element-selected'])
+const emit = defineEmits(['page-selected', 'element-selected', 'edge-click'])
 
 // Pages state
 const pages = ref([
@@ -171,6 +171,17 @@ const addElementToCurrentPage = (element) => {
   }
 }
 
+// Add element to specific page
+const addElementToPage = (pageId, element) => {
+  const page = pages.value.find(p => p.id === pageId)
+  if (page) {
+    page.elements.push({
+      ...element,
+      id: `el-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+    })
+  }
+}
+
 // Export current page
 const exportCurrentPage = () => {
   // This will be called from parent
@@ -200,6 +211,7 @@ defineExpose({
   selectedPage,
   addPage,
   addElementToCurrentPage,
+  addElementToPage,
   exportCurrentPage
 })
 </script>
@@ -290,6 +302,7 @@ defineExpose({
             :is-selected="page.id === selectedPageId"
             @update-elements="(els) => updatePageElements(page.id, els)"
             @element-selected="(el) => emit('element-selected', el, page.id)"
+            @edge-click="(elementId, edge) => emit('edge-click', elementId, edge, page.id)"
           />
         </div>
       </div>
